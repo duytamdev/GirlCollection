@@ -6,6 +6,7 @@ import {
   Image,
   Alert,
   TouchableOpacity,
+  ToastAndroid,
 } from 'react-native';
 import RenderHtml from 'react-native-render-html';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
@@ -38,8 +39,22 @@ const SectionFooter = ({onDownload}) => {
     <View style={{marginTop: 10}}>
       <View style={styles.diver} />
       <View style={styles.footerContent}>
-        <MaterialCommunityIcons name="share-outline" size={28} color="black" />
-        <FontAwesome name="comment-o" size={24} color="black" />
+        <TouchableOpacity
+          onPress={() =>
+            ToastAndroid.show('Features in development', ToastAndroid.SHORT)
+          }>
+          <MaterialCommunityIcons
+            name="share-outline"
+            size={28}
+            color="black"
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            ToastAndroid.show('Features in development', ToastAndroid.SHORT)
+          }>
+          <FontAwesome name="comment-o" size={24} color="black" />
+        </TouchableOpacity>
         <TouchableOpacity onPress={onDownload}>
           <Feather name="download" size={24} color="black" />
         </TouchableOpacity>

@@ -5,6 +5,7 @@ import {
   FlatList,
   RefreshControl,
   TouchableOpacity,
+  ActivityIndicator,
   Animated,
 } from 'react-native';
 import axiosInstance, {API_KEY} from '../utils/axios';
@@ -49,12 +50,9 @@ const HomeScreen = () => {
   useEffect(() => {
     fetchData().then();
   }, []);
-  if (__DEV__) {
-    console.log(nextPage);
-  }
   return (
     <View style={styles.container}>
-      {data.length > 0 && (
+      {data.length > 0 ? (
         <>
           <FlatList
             onScroll={e => {
@@ -91,6 +89,8 @@ const HomeScreen = () => {
             </TouchableOpacity>
           </Animated.View>
         </>
+      ) : (
+        <ActivityIndicator size="large" color="white" />
       )}
     </View>
   );
@@ -98,6 +98,8 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#ffb5b5',
   },
   btnToTop: {
