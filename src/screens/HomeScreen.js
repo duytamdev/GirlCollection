@@ -5,26 +5,24 @@ import {
   FlatList,
   RefreshControl,
   TouchableOpacity,
+  Text,
   ActivityIndicator,
   Animated,
 } from 'react-native';
 import axiosInstance, {API_KEY} from '../utils/axios';
 import PostItem from '../components/PostItem';
-import {AntDesign, Feather} from '@expo/vector-icons';
+import {AntDesign} from '@expo/vector-icons';
 const HomeScreen = () => {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [nextPage, setNextPage] = useState(1);
   const animatedValue = useRef(new Animated.Value(0)).current;
   const listRef = useRef(null);
-  const handleRefresh = () => {
-    setLoading(true);
-    fetchData().then(setLoading(false));
+  const handleLoadMore = () => {
+    fetchData().then();
   };
   const handleMoveToTop = () => {
     listRef.current.scrollToOffset({offset: 0, animated: true});
   };
-
   const fetchData = async () => {
     axiosInstance
       .get(`/posts/?api_key=${API_KEY}&page_number=${nextPage}`)
@@ -44,8 +42,21 @@ const HomeScreen = () => {
             tags: item.tags,
           };
         });
-        setData([...newData, ...data]);
+        setData([...data, ...newData]);
       });
+  };
+  const ListFooterComponent = () => {
+    return (
+      <View
+        style={{
+          height: 50,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: '#fff',
+        }}>
+        <Text>Loading...</Text>
+      </View>
+    );
   };
   useEffect(() => {
     fetchData().then();
@@ -60,11 +71,12 @@ const HomeScreen = () => {
             }}
             scrollEventThrottle={16}
             ref={listRef}
+            onEndReachedThreshold={0.5}
+            onEndReached={handleLoadMore}
             keyExtractor={item => item.id}
             removeClippedSubviews
-            refreshControl={
-              <RefreshControl refreshing={loading} onRefresh={handleRefresh} />
-            }
+            ListFooterComponent={() => <ListFooterComponent />}
+            refreshControl={<RefreshControl refreshing={false} />}
             data={data}
             renderItem={({item}) => {
               return <PostItem item={item} />;
@@ -81,9 +93,6 @@ const HomeScreen = () => {
                 }),
               },
             ]}>
-            <TouchableOpacity style={styles.btnToTop} onPress={handleRefresh}>
-              <Feather name="refresh-ccw" size={24} color="#fff" />
-            </TouchableOpacity>
             <TouchableOpacity style={styles.btnToTop} onPress={handleMoveToTop}>
               <AntDesign name="arrowup" size={24} color={'#fff'} />
             </TouchableOpacity>

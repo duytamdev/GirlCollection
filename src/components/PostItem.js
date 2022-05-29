@@ -1,10 +1,11 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {
   Text,
   View,
   StyleSheet,
   Image,
   Alert,
+  Pressable,
   TouchableOpacity,
   ToastAndroid,
 } from 'react-native';
@@ -65,6 +66,16 @@ const SectionFooter = ({onDownload}) => {
   );
 };
 const PostItem = ({item}) => {
+  const lastTap = useRef(0);
+  const handleTap = () => {
+    const now = Date.now();
+    const diff = now - lastTap.current;
+    const DELAY = 500;
+    if (diff < DELAY) {
+      // double tap
+    }
+    lastTap.current = now;
+  };
   const getPermissionAsync = async () => {
     const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -88,14 +99,17 @@ const PostItem = ({item}) => {
         await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
       }
     } catch (e) {
-      console.log('error', e);
+      if (__DEV__) {
+        console.log('error', e);
+      }
       return;
     }
-    Alert.alert('Hình ảnh đã được tải về thành công');
+    Alert.alert('Image saved to gallery 😊');
   }, []);
   return (
-    <View style={styles.container}>
+    <Pressable onPress={handleTap} style={styles.container}>
       <Image
+        defaultSource={require('../../assets/imageplanholder.jpg')}
         style={{
           width: '100%',
           aspectRatio: item.imageSize.width / item.imageSize.height,
@@ -111,13 +125,12 @@ const PostItem = ({item}) => {
         </View>
         <SectionFooter onDownload={() => handleDownloadImage(item.imageUri)} />
       </View>
-    </View>
+    </Pressable>
   );
 };
 const styles = StyleSheet.create({
   content: {paddingHorizontal: 16},
   container: {
-    marginBottom: 8,
     backgroundColor: '#fff',
   },
   tagsContainer: {
